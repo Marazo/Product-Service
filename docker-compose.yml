@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: products
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+  
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: host.docker.internal
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: products
+      CONTENTFUL_SPACE_ID: 9xs1613l9f7v
+      CONTENTFUL_ACCESS_TOKEN: I-ThsT55eE_B3sCUWEQyDT4VqVO3x__20ufuie9usns
+      CONTENTFUL_ENVIRONMENT: master
+      CONTENTFUL_CONTENT_TYPE: product
+      JWT_SECRET: 8e1a5b0c2580834e3bea16bfb15b7e75740572ccb721d7625f7d9b30d595c52b
+    volumes:
+      - .:/app
+    networks:
+      - app-network
+    command: pnpm start:dev
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
